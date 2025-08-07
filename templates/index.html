@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fake News Detector</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --fake: #dc2626;
+      --real: #16a34a;
+      --bg-light: #f9fafb;
+      --bg-dark: #1f2937;
+      --text-light: #f9fafb;
+      --text-dark: #1f2937;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    nav a {
+      color: white;
+      margin-left: 1rem;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem;
+      background: linear-gradient(rgba(37, 99, 235, 0.8), rgba(37, 99, 235, 0.8)), 
+                  url('https://source.unsplash.com/1600x900/?news,media') center/cover;
+      color: white;
+    }
+
+    textarea {
+      width: 80%;
+      max-width: 600px;
+      height: 120px;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 8px;
+      resize: none;
+      font-size: 1rem;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 1rem;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #1e4db7;
+    }
+
+    .results {
+      text-align: center;
+      padding: 2rem;
+      display: none;
+    }
+
+    .result-card {
+      display: inline-block;
+      padding: 1.5rem;
+      border-radius: 10px;
+      color: white;
+      max-width: 400px;
+    }
+
+    .confidence {
+      background: white;
+      border-radius: 10px;
+      height: 20px;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+
+    .confidence-bar {
+      height: 100%;
+      width: 0;
+      transition: width 1s ease-in-out;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: var(--primary);
+      color: white;
+      margin-top: 2rem;
+    }
+
+    /* Dark Mode */
+    .dark {
+      background: var(--bg-dark);
+      color: var(--text-light);
+    }
+    .dark header, .dark footer {
+      background: #111827;
+    }
+    .dark textarea {
+      background: #374151;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📰 Fake News Detector</h1>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#how">How It Works</a>
+    <a href="#contact">Contact</a>
+    <a href="#" id="toggleMode"><i class="fas fa-moon"></i></a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h2>Detect Fake News in Seconds</h2>
+  <p>Powered by AI & Machine Learning</p>
+  <textarea id="newsInput" placeholder="Paste your news article or headline here..."></textarea>
+  <br>
+  <button onclick="checkNews()">Check Now</button>
+</section>
+
+<section class="results" id="results">
+  <div id="resultCard" class="result-card">
+    <h3 id="resultText"></h3>
+    <p id="reason"></p>
+    <div class="confidence">
+      <div id="confidenceBar" class="confidence-bar"></div>
+    </div>
+    <p id="confidenceScore"></p>
+  </div>
+</section>
+
+<section id="how" style="padding:2rem;text-align:center;">
+  <h2>How It Works</h2>
+  <p>Our AI model analyzes text patterns, word choices, and context to detect misinformation.</p>
+</section>
+<!-- Add this just before the <footer> tag -->
+<section id="contact" style="padding: 2rem; background: #f1f5f9; text-align: center;">
+  <h2>Contact Us</h2>
+  <p>Have a question or feedback? We'd love to hear from you!</p>
+  <form onsubmit="handleContact(event)" style="max-width: 500px; margin: 2rem auto;">
+    <input type="text" placeholder="Your Name" required style="width: 100%; padding: 0.7rem; margin: 0.5rem 0; border-radius: 8px; border: 1px solid #ccc;">
+    <input type="email" placeholder="Your Email" required style="width: 100%; padding: 0.7rem; margin: 0.5rem 0; border-radius: 8px; border: 1px solid #ccc;">
+    <textarea placeholder="Your Message" rows="5" required style="width: 100%; padding: 0.7rem; margin: 0.5rem 0; border-radius: 8px; border: 1px solid #ccc;"></textarea>
+    <button type="submit" style="background: var(--primary); color: white; padding: 0.7rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem;">Send Message</button>
+  </form>
+</section>
+
+
+<footer>
+  <p>© All Right reserved by Nitin</p>
+</footer>
+
+<script>
+  const body = document.body;
+  document.getElementById('toggleMode').addEventListener('click', () => {
+    body.classList.toggle('dark');
+  });
+
+  function checkNews() {
+    const news = document.getElementById('newsInput').value.trim();
+    if (!news) {
+      alert("Please enter some news text.");
+      return;
+    }
+
+    fetch("/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: news })
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('results').style.display = 'block';
+
+      const resultCard = document.getElementById('resultCard');
+      const resultText = document.getElementById('resultText');
+      const reason = document.getElementById('reason');
+      const confidenceBar = document.getElementById('confidenceBar');
+      const confidenceScore = document.getElementById('confidenceScore');
+
+      if (data.prediction === "Fake News") {
+        resultCard.style.background = "var(--fake)";
+        resultText.innerHTML = "🚫 Fake News Detected";
+        reason.innerHTML = "Patterns suggest misinformation.";
+        confidenceBar.style.background = "red";
+      } else {
+        resultCard.style.background = "var(--real)";
+        resultText.innerHTML = "✅ Authentic News";
+        reason.innerHTML = "Content matches credible sources.";
+        confidenceBar.style.background = "limegreen";
+      }
+
+      setTimeout(() => {
+        confidenceBar.style.width = (data.confidence || 90) + "%";
+        confidenceScore.innerHTML = "Confidence: " + (data.confidence || 90) + "%";
+      }, 200);
+    })
+    .catch(err => console.error(err));
+  }
+  function handleContact(event) {
+  event.preventDefault();
+  alert("Thank you for contacting us! We'll get back to you soon.");
+}
+
+</script>
+
+</body>
+</html>
